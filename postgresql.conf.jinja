@@ -1,0 +1,26 @@
+data_directory = '/var/lib/postgresql/{{ version }}/main'
+hba_file = '/etc/postgresql/{{ version }}/main/pg_hba.conf'
+ident_file = '/etc/postgresql/{{ version }}/main/pg_ident.conf'
+external_pid_file = '/var/run/postgresql/{{ version }}-main.pid'
+
+listen_addresses = ''
+port = 5432
+max_connections = {{ max_connections }}
+unix_socket_directories = '/var/run/postgresql'
+ssl = off
+shared_buffers = 128MB
+dynamic_shared_memory_type = posix
+
+log_line_prefix = '%m [%p] %q%u@%d '
+log_timezone = 'localtime'
+cluster_name = '{{ version }}/main'
+stats_temp_directory = '/var/run/postgresql/{{ version }}-main.pg_stat_tmp'
+
+datestyle = 'iso, mdy'
+timezone = 'localtime'
+lc_messages = 'en_US.UTF-8'
+lc_monetary = 'en_US.UTF-8'
+lc_numeric = 'en_US.UTF-8'
+lc_time = 'en_US.UTF-8'
+default_text_search_config = 'pg_catalog.english'
+include_dir = 'conf.d'
