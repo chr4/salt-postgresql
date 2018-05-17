@@ -1,4 +1,4 @@
-{% set version = '10' %}
+{% set version = pillar['postgresql']['version']|default('10') %}
 
 postgresql:
   pkg.installed:
@@ -31,18 +31,23 @@ postgresql:
     - mode: 640
     - user: postgres
     - group: postgres
-    - source: salt://{{ slspath }}/pg_hba.conf
+    - source: salt://{{ slspath }}/pg_hba.conf.jinja
+    - template: jinja
     - require:
       - pkg: postgresql
 
-createuser nextcloud:
+
+{% for username, config in pillar['postgresql']['users'].items() %}
+createuser-{{ username }}:
   cmd.run:
-    - unless: psql -t -c "SELECT 1 FROM pg_roles WHERE rolname='nextcloud'" |grep -q 1
+    - name: createuser {{ config['args']|default('') }} {{ username }}
+    - unless: psql -t -c "SELECT 1 FROM pg_roles WHERE rolname='{{ username }}'" |grep -q 1
     - runas: postgres
 
-createdb -O nextcloud nextcloud:
+createdb -O {{ username }} {{ config['database'] }}:
   cmd.run:
-    - unless: psql -t -c "SELECT 1 FROM pg_database WHERE datname='nextcloud'" |grep -q 1
+    - unless: psql -t -c "SELECT 1 FROM pg_database WHERE datname='{{ config['database'] }}'" |grep -q 1
     - runas: postgres
     - require:
-      - cmd: "createuser nextcloud"
+      - cmd: createuser-{{ username }}
+{% endfor %}

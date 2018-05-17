@@ -1,0 +1,15 @@
+postgresql:
+  version: 10
+
+  users:
+    deploy:
+      type: host
+      database: triebwerk
+      address: 10.13.37.0/24
+      method: trust
+    replicant:
+      type: host
+      database: replication
+      address: 10.13.37.0/24
+      method: trust
+      args: '--replication'
