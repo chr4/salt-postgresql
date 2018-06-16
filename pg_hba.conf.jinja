@@ -2,5 +2,5 @@
 local                 all                     postgres                              trust
 
 {% for username, config in pillar['postgresql']['users'].items() %}
-{{ config['type'] }} {{ config['database'] }} {{ username }} {{ config['address'] }} {{ config['method'] }}
+{{ config['type'] }} {{ config['database'] }} {{ username }} {{ config['address']|default('') }} {{ config['method'] }}
 {% endfor %}
