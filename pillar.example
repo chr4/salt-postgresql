@@ -1,15 +1,54 @@
+# vim: ft=yaml
+
 postgresql:
   version: 10
 
+  # Call reload action instead of restart upon configuration changes.
+  # This defaults to "true", as restarts result in a short downtime
+  reload: true
+
+  # Packages to additionally install
+  # additional_dependencies: [awscli, git]
+
+  postgis:
+    version: 2.3
+
+  # Configure postgresql.conf settings. The configuration shown below are the defaults. They
+  # are supposed to fit to a generic database-only machine.
+  #
+  # NOTE: Only the settings shown here are actually configurable currently. For a complete list
+  #       of variables, see postgresql.conf.jinja
+  config:
+    {% set max_connections = 100 %}
+    listen_addresses: "''"
+    max_connections: {{ max_connections }}
+    work_mem: {{ (grains['mem_total'] * 0.9 / max_connections)|int }}MB
+    shared_buffers: {{ (grains['mem_total'] * 0.1)|int }}MB
+    maintenance_work_mem: {{ (grains['mem_total'] / 1024 * 50)|int }}MB
+    effective_cache_size: {{ (grains['mem_total'] * 0.8)|int }}MB
+
+    # If archive_command is specified, hot_stanby will be enabled automatically
+    # archive_command: "rsync [...]"
+
+  # If you want to use the default settings of postgresql, set it to the following
+  config:
+    listen_addresses: 'localhost'
+    max_connections: 100
+    work_mem: 4MB
+    shared_buffers: 128MB
+    maintenance_work_mem: 64MB
+    effective_cache_size: 4GB
+
+  # These users will be created and added to pg_hba.conf
   users:
     deploy:
       type: host
       database: triebwerk
-      address: 10.13.37.0/24
+      address: 10.14.38.0/24
       method: trust
     replicant:
       type: host
       database: replication
-      address: 10.13.37.0/24
+      address: 10.14.38.0/24
       method: trust
       args: '--replication'
