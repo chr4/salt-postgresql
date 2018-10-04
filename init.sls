@@ -63,7 +63,8 @@ chown_pgdata:
     - require:
       - pkg: postgresql
 
-{% for username, config in pillar['postgresql']['users'].items() %}
+# Deploy users. Sort them, so order is not changing between salt runs
+{% for username, config in pillar['postgresql']['users']|dictsort %}
 createuser-{{ username }}:
   cmd.run:
     - name: createuser {{ config['args']|default('') }} {{ username }}
