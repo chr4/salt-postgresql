@@ -188,6 +188,23 @@ wal_compression = on
 # connections from standby servers.
 max_wal_senders = 5
 
+# When this parameter is on, the PostgreSQL server writes the entire content of each disk page
+# to WAL during the first modification of that page after a checkpoint, even for non-critical
+#
+# modifications of so-called hint bits. If data checksums are enabled, hint bit updates are
+# always WAL-logged and this setting is ignored. You can use this setting to test how much
+# extra WAL-logging would occur if your database had data checksums enabled.
+#
+# pg_rewind requires that the target server either has the wal_log_hints option enabled in
+# postgresql.conf or data checksums enabled when the cluster was initialized with initdb.
+# Neither of these are currently on by default. full_page_writes must also be set to on, but is
+# enabled by default.
+{%- if wal_log_hints %}
+wal_log_hints = on
+{%- else %}
+wal_log_hints = off
+{%- endif %}
+
 # When archive_mode is enabled, completed WAL segments are sent to archive storage by setting
 # archive_command. archive_mode and archive_command are separate variables so that archive_command
 # can be changed without leaving archiving mode.
