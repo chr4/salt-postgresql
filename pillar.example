@@ -46,9 +46,16 @@ postgresql:
       database: triebwerk
       address: 10.14.38.0/24
       method: trust
+    user_with_password:
+      type: host
+      database: triebwerk
+      address: 10.14.38.0/24
+      method: trust
+      options: PASSWORD 'supersecret' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN
     replicant:
       type: host
       database: replication
       address: 10.14.38.0/24
       method: trust
-      args: '--replication'
+      options: NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN REPLICATION
+      password:

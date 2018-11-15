@@ -71,14 +71,15 @@ chown_pgdata:
 {% for username, config in pillar['postgresql']['users']|dictsort %}
 createuser-{{ username }}:
   cmd.run:
-    - name: createuser {{ config['args']|default('') }} {{ username }}
+    - name: psql -t -c "CREATE ROLE {{ username }} {{ config['options']|default('NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN') }};"
     - unless: psql -t -c "SELECT 1 FROM pg_roles WHERE rolname='{{ username }}'" |grep -q 1
     - runas: postgres
 
 # The "replication" keyword is not a real database, but just used for permissions in pg_hba.conf
 {% if config['database'] != "replication" %}
-createdb -O {{ username }} {{ config['database'] }}:
+createdb-{{ username }}:
   cmd.run:
+    - name: psql -t -c "CREATE DATABASE {{ config['database'] }} OWNER {{ username }};"
     - unless: psql -t -c "SELECT 1 FROM pg_database WHERE datname='{{ config['database'] }}'" |grep -q 1
     - runas: postgres
     - require:
