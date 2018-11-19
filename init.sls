@@ -45,12 +45,15 @@ chown_pgdata:
       shared_buffers: {{ (grains['mem_total'] * 0.1)|int }}MB
       maintenance_work_mem: {{ (grains['mem_total'] / 1024 * 50)|int }}MB
       effective_cache_size: {{ (grains['mem_total'] * 0.8)|int }}MB
+      wal_level: replica
       wal_log_hints: false
+      max_wal_senders: 5
     - context:
       # Override defaults from pillar configuration
 {% for var in [
   'listen_addresses', 'work_mem', 'shared_buffers', 'maintenance_work_mem',
-  'effective_cache_size', 'archive_command', 'wal_log_hints'
+  'effective_cache_size', 'archive_command', 'wal_level', 'wal_log_hints', 'max_wal_senders',
+  'wal_keep_segments', 'wal_buffers'
   ] %}
   {% if pg_config[var] is defined %}
       {{ var }}: {{ pg_config[var] }}

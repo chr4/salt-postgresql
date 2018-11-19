@@ -153,25 +153,16 @@ maintenance_work_mem = '{{ maintenance_work_mem }}'
 # megabytes (128MB). Should be between 0.6 and 0.8 of system ram
 effective_cache_size = '{{ effective_cache_size }}'
 
-{% if archive_command is defined %}
-# The amount of shared memory used for WAL data that has not yet been written to disk. The default
-# setting of -1 selects a size equal to 1/32nd (about 3%) of shared_buffers, but not less than 64kB
-# nor more than the size of one WAL segment, typically 16MB. The contents of the WAL buffers are
-# written out to disk at every transaction commit, so extremely large values are unlikely to provide
-# a significant benefit. However, setting this value to at least a few megabytes can improve write
-# performance on a busy server where many clients are committing at once. The auto-tuning selected
-# by the default setting of -1 should give reasonable results in most cases.
-wal_buffers = '16MB'
-
-# Specifies whether or not you can connect and run queries during recovery
-hot_standby = on
-
 # wal_level determines how much information is written to the WAL. The default value is minimal,
 # which writes only the information needed to recover from a crash or immediate shutdown. archive
 # adds logging required for WAL archiving, and hot_standby further adds information required to run
 # read-only queries on a standby server.
-wal_level = 'hot_standby'
+wal_level = {{ wal_level }}
 
+# Specifies whether or not you can connect and run queries during recovery
+hot_standby = on
+
+{% if wal_level != 'minimal' %}
 # When this parameter is on, the PostgreSQL server compresses a full page image written to WAL when
 # full_page_writes is on or during a base backup. A compressed page image will be decompressed
 # during WAL replay. The default value is off. Only superusers can change this setting.  Turning
@@ -186,7 +177,34 @@ wal_compression = on
 # number of connections, so the parameter cannot be set higher than max_connections. This parameter
 # can only be set at server start. wal_level must be set to archive or hot_standby to allow
 # connections from standby servers.
-max_wal_senders = 5
+max_wal_senders = {{ max_wal_senders }}
+
+{% if wal_buffers is defined %}
+# The amount of shared memory used for WAL data that has not yet been written to disk. The default
+# setting of -1 selects a size equal to 1/32nd (about 3%) of shared_buffers, but not less than 64kB
+# nor more than the size of one WAL segment, typically 16MB. The contents of the WAL buffers are
+# written out to disk at every transaction commit, so extremely large values are unlikely to provide
+# a significant benefit. However, setting this value to at least a few megabytes can improve write
+# performance on a busy server where many clients are committing at once. The auto-tuning selected
+# by the default setting of -1 should give reasonable results in most cases.
+wal_buffers = '{{ wal_buffers }}'
+{%- endif %}
+
+{% if wal_keep_segments is defined %}
+# Specifies the minimum number of past log file segments kept in the pg_xlog directory, in case a
+# standby server needs to fetch them for streaming replication. Each segment is normally 16
+# megabytes. If a standby server connected to the sending server falls behind by more than
+# wal_keep_segments segments, the sending server might remove a WAL segment still needed by the
+# standby, in which case the replication connection will be terminated. Downstream connections will
+# also eventually fail as a result. (However, the standby server can recover by fetching the segment
+# from archive, if WAL archiving is in use.) This sets only the minimum number of segments retained
+# in pg_xlog; the system might need to retain more segments for WAL archival or to recover from a
+# checkpoint. If wal_keep_segments is zero (the default), the system doesn't keep any extra segments
+# for standby purposes, so the number of old WAL segments available to standby servers is a function
+# of the location of the previous checkpoint and status of WAL archiving. This parameter can only be
+# set in the postgresql.conf file or on the server command line.
+wal_keep_segments = {{ wal_keep_segments }}
+{%- endif %}
 
 # When this parameter is on, the PostgreSQL server writes the entire content of each disk page
 # to WAL during the first modification of that page after a checkpoint, even for non-critical
@@ -205,6 +223,7 @@ wal_log_hints = on
 wal_log_hints = off
 {%- endif %}
 
+{% if archive_command is defined %}
 # When archive_mode is enabled, completed WAL segments are sent to archive storage by setting
 # archive_command. archive_mode and archive_command are separate variables so that archive_command
 # can be changed without leaving archiving mode.
@@ -230,21 +249,9 @@ archive_mode = on
 # --whole-file            copy files whole (w/o delta-xfer algorithm)
 # --ignore-existing       skip updating files that exist on receiver
 archive_command = '{{ archive_command }}'
+{%- endif %}
 
-# Specifies the minimum number of past log file segments kept in the pg_xlog directory, in case a
-# standby server needs to fetch them for streaming replication. Each segment is normally 16
-# megabytes. If a standby server connected to the sending server falls behind by more than
-# wal_keep_segments segments, the sending server might remove a WAL segment still needed by the
-# standby, in which case the replication connection will be terminated. Downstream connections will
-# also eventually fail as a result. (However, the standby server can recover by fetching the segment
-# from archive, if WAL archiving is in use.) This sets only the minimum number of segments retained
-# in pg_xlog; the system might need to retain more segments for WAL archival or to recover from a
-# checkpoint. If wal_keep_segments is zero (the default), the system doesn't keep any extra segments
-# for standby purposes, so the number of old WAL segments available to standby servers is a function
-# of the location of the previous checkpoint and status of WAL archiving. This parameter can only be
-# set in the postgresql.conf file or on the server command line.
-wal_keep_segments = 32
-{% endif %}
+{%- endif %}
 
 # Sets the number of concurrent disk I/O operations that PostgreSQL expects can be executed
 # simultaneously. Raising this value will increase the number of I/O operations that any individual

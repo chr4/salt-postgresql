@@ -26,6 +26,13 @@ postgresql:
     shared_buffers: {{ (grains['mem_total'] * 0.1)|int }}MB
     maintenance_work_mem: {{ (grains['mem_total'] / 1024 * 50)|int }}MB
     effective_cache_size: {{ (grains['mem_total'] * 0.8)|int }}MB
+    wal_level: replica
+    wal_log_hints: false
+    max_wal_senders: 5 # NOTE: This setting is only deployed when wal_level is not "minimal"
+
+    wal_keep_segments: (unset)
+    wal_buffers: (unset)
+
 
     # If archive_command is specified, hot_stanby will be enabled automatically
     # archive_command: "rsync [...]"
