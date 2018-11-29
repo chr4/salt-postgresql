@@ -162,7 +162,11 @@ wal_level = {{ wal_level }}
 # Specifies whether or not you can connect and run queries during recovery
 hot_standby = on
 
-{% if wal_level != 'minimal' %}
+{% if wal_level == 'minimal' %}
+# Disable wal senders when wal_level is minimal
+max_wal_senders = 0
+
+{%- else %}
 # When this parameter is on, the PostgreSQL server compresses a full page image written to WAL when
 # full_page_writes is on or during a base backup. A compressed page image will be decompressed
 # during WAL replay. The default value is off. Only superusers can change this setting.  Turning
