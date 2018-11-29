@@ -280,6 +280,18 @@ log_lock_waits = on
 # locking delays you might want to set a shorter than normal deadlock_timeout.
 deadlock_timeout = '30s'
 
+# Specifies the dynamic shared memory implementation that the server should use. Possible
+# values are posix (for POSIX shared memory allocated using shm_open), sysv (for System V
+# shared memory allocated via shmget), windows (for Windows shared memory), mmap (to simulate
+# shared memory using memory-mapped files stored in the data directory), and none (to disable
+# this feature). Not all values are supported on all platforms; the first supported option is
+# the default for that platform. The use of the mmap option, which is not the default on any
+# platform, is generally discouraged because the operating system may write modified pages back
+# to disk repeatedly, increasing system I/O load; however, it may be useful for debugging, when
+# the pg_dynshmem directory is stored on a RAM disk, or when other shared memory facilities are
+# not available.
+dynamic_shared_memory_type = posix
+
 # Causes the duration of each completed statement to be logged if the statement ran for at least the
 # specified number of milliseconds. Setting this to zero prints all statement durations. Minus-one
 # (the default) disables logging statement durations. For example, if you set it to 250ms then all
