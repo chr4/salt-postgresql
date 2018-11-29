@@ -47,7 +47,7 @@ chown_pgdata:
       effective_cache_size: {{ (grains['mem_total'] * 0.8)|int }}MB
       wal_level: replica
       wal_log_hints: false
-      max_wal_senders: 5
+      max_wal_senders: 5 # NOTE: Since postgresql-10, the default is 10
     - context:
       # Override defaults from pillar configuration
 {% for var in [
