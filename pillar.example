@@ -48,18 +48,18 @@ postgresql:
 
   # These users will be created and added to pg_hba.conf
   users:
-    deploy:
+    - username: deploy
       type: host
       database: triebwerk
       address: 10.14.38.0/24
       method: trust
-    user_with_password:
+    - username: user_with_password
       type: host
       database: triebwerk
       address: 10.14.38.0/24
       method: trust
       options: PASSWORD 'supersecret' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN
-    replicant:
+    - username: replicant
       type: host
       database: replication
       address: 10.14.38.0/24

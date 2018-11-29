@@ -1,6 +1,6 @@
 # TYPE  DATABASE  USER      ADDRESS  METHOD
 local   all       postgres           trust
 
-{%- for username, config in pillar['postgresql']['users']|dictsort %}
-{{ config['type'] }} {{ config['database'] }} {{ username }} {{ config['address']|default('') }} {{ config['method'] }}
-{% endfor -%}
+{%- for config in pillar['postgresql']['users'] %}
+{{ config['type'] }} {{ config['database'] }} {{ config['username'] }} {{ config['address']|default('') }} {{ config['method'] }}
+{%- endfor -%}

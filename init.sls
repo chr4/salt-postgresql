@@ -71,21 +71,21 @@ chown_pgdata:
       - pkg: postgresql
 
 # Deploy users. Sort them, so order is not changing between salt runs
-{% for username, config in pillar['postgresql']['users']|dictsort %}
-createuser-{{ username }}:
+{% for config in pillar['postgresql']['users'] %}
+createuser-{{ loop.index }}:
   cmd.run:
-    - name: psql -t -c "CREATE ROLE {{ username }} {{ config['options']|default('NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN') }};"
-    - unless: psql -t -c "SELECT 1 FROM pg_roles WHERE rolname='{{ username }}'" |grep -q 1
+    - name: psql -t -c "CREATE ROLE {{ config['username'] }} {{ config['options']|default('NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN') }};"
+    - unless: psql -t -c "SELECT 1 FROM pg_roles WHERE rolname='{{ config['username'] }}'" |grep -q 1
     - runas: postgres
 
 # The "replication" keyword is not a real database, but just used for permissions in pg_hba.conf
 {% if config['database'] != "replication" %}
-createdb-{{ username }}:
+createdb-{{ loop.index }}:
   cmd.run:
-    - name: psql -t -c "CREATE DATABASE {{ config['database'] }} OWNER {{ username }};"
+    - name: psql -t -c "CREATE DATABASE {{ config['database'] }} OWNER {{ config['username'] }};"
     - unless: psql -t -c "SELECT 1 FROM pg_database WHERE datname='{{ config['database'] }}'" |grep -q 1
     - runas: postgres
     - require:
-      - cmd: createuser-{{ username }}
+      - cmd: createuser-{{ loop.index }}
 {% endif %}
 {% endfor %}
