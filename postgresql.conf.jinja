@@ -122,14 +122,6 @@ shared_buffers = '{{ shared_buffers }}'
 # set in the postgresql.conf file or on the server command line.
 max_wal_size = '3GB'
 
-# Specifies how much data can flow over an SSL-encrypted connection before renegotiation of the
-# session keys will take place. Renegotiation decreases an attacker's chances of doing cryptanalysis
-# when large amounts of traffic can be examined, but it also carries a large performance penalty.
-# The sum of sent and received traffic is used to check the limit. If this parameter is set to 0,
-# renegotiation is disabled.
-# pg_basebackup fails on production, if this is enabled/too low.
-ssl_renegotiation_limit = 0
-
 # Maximum time between automatic WAL checkpoints, in seconds
 checkpoint_timeout = 30min
 
