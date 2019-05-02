@@ -71,7 +71,7 @@ chown_pgdata:
       - pkg: postgresql
 
 # Deploy users. Sort them, so order is not changing between salt runs
-{% for config in pillar['postgresql']['users'] %}
+{% for config in pillar['postgresql']['users']|default({}) %}
 createuser-{{ loop.index }}:
   cmd.run:
     - name: psql -t -c "CREATE ROLE {{ config['username'] }} {{ config['options']|default('NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN') }};"
