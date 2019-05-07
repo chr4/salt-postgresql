@@ -1,6 +1,4 @@
-{% set version = pillar['postgresql']['version']|default('10') %}
-{% set pg_config = pillar['postgresql']['config']|default({}) %}
-{% set max_connections = pg_config['max_connections']|default(100) %}
+{% set version = salt['pillar.get']('postgresql:version', 11) %}
 
 # Install postgresql
 postgresql:
@@ -40,6 +38,7 @@ chown_pgdata:
       # These are the defaults, which can be overridden by pillars
       version: {{ version }}
       listen_addresses: ''
+      {% set max_connections = salt['pillar.get']('postgresql:config:max_connections', 100) %}
       max_connections: {{ max_connections }}
       work_mem: {{ (grains['mem_total'] * 0.9 / max_connections)|int }}MB
       shared_buffers: {{ (grains['mem_total'] * 0.1)|int }}MB
@@ -50,13 +49,14 @@ chown_pgdata:
       max_wal_senders: 5 # NOTE: Since postgresql-10, the default is 10
     - context:
       # Override defaults from pillar configuration
-{% for var in [
+{% for key in [
   'listen_addresses', 'work_mem', 'shared_buffers', 'maintenance_work_mem',
   'effective_cache_size', 'archive_command', 'wal_level', 'wal_log_hints', 'max_wal_senders',
   'wal_keep_segments', 'wal_buffers'
   ] %}
-  {% if pg_config[var] is defined %}
-      {{ var }}: {{ pg_config[var] }}
+  {% set value = salt['pillar.get']('postgresql:config:' + key, undefined) %}
+  {% if value is defined %}
+      {{ key }}: {{ value }}
   {% endif %}
 {% endfor %}
 
