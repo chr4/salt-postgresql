@@ -1,4 +1,4 @@
-{% set version = salt.pillar.get('postgresql:version', 11) %}
+{% set version = salt['pillar.get']('postgresql:version', 11) %}
 
 # Install postgresql
 postgresql:
@@ -38,7 +38,7 @@ chown_pgdata:
       # These are the defaults, which can be overridden by pillars
       version: {{ version }}
       listen_addresses: ''
-      {% set max_connections = salt.pillar.get('postgresql:config:max_connections', 100) %}
+      {% set max_connections = salt['pillar.get']('postgresql:config:max_connections', 100) %}
       max_connections: {{ max_connections }}
       work_mem: {{ (grains['mem_total'] * 0.9 / max_connections)|int }}MB
       shared_buffers: {{ (grains['mem_total'] * 0.1)|int }}MB
@@ -54,7 +54,7 @@ chown_pgdata:
   'effective_cache_size', 'archive_command', 'wal_level', 'wal_log_hints', 'max_wal_senders',
   'wal_keep_segments', 'wal_buffers'
   ] %}
-  {% set value = salt.pillar.get('postgresql:config:' + key, undefined) %}
+  {% set value = salt['pillar.get']('postgresql:config:' + key, undefined) %}
   {% if value is defined %}
       {{ key }}: {{ value }}
   {% endif %}
