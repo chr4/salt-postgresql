@@ -53,12 +53,14 @@ postgresql:
       database: triebwerk
       address: 10.14.38.0/24
       method: trust
+      gisdb: true
     - username: user_with_password
       type: host
       database: triebwerk
       address: 10.14.38.0/24
       method: trust
       options: PASSWORD 'supersecret' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN
+      gisdb: true
     - username: replicant
       type: host
       database: replication
@@ -66,3 +68,4 @@ postgresql:
       method: trust
       options: NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN REPLICATION
       password:
+      gisdb: false
