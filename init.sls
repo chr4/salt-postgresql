@@ -72,20 +72,31 @@ chown_pgdata:
 
 # Deploy users. Sort them, so order is not changing between salt runs
 {% for config in pillar['postgresql']['users']|default({}) %}
-createuser-{{ loop.index }}:
+createuser-{{ config['username'] }}:
   cmd.run:
     - name: psql -t -c "CREATE ROLE {{ config['username'] }} {{ config['options']|default('NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN') }};"
     - unless: psql -t -c "SELECT 1 FROM pg_roles WHERE rolname='{{ config['username'] }}'" |grep -q 1
     - runas: postgres
+{% endfor %}
 
-# The "replication" keyword is not a real database, but just used for permissions in pg_hba.conf
+{% for config in pillar['postgresql']['databases']|default({}) %}
 {% if config['database'] != "replication" %}
-createdb-{{ loop.index }}:
+createdb-{{ config['database'] }}:
   cmd.run:
     - name: psql -t -c "CREATE DATABASE {{ config['database'] }} OWNER {{ config['username'] }};"
     - unless: psql -t -c "SELECT 1 FROM pg_database WHERE datname='{{ config['database'] }}'" |grep -q 1
     - runas: postgres
     - require:
-      - cmd: createuser-{{ loop.index }}
+      - cmd: createuser-{{ config['username'] }}
 {% endif %}
+{% endfor %}
+
+{% for config in pillar['postgresql']['schemas']|default({}) %}
+createschema-{{ config['schemaname'] }}:
+  cmd.run:
+    - name: psql -t -d {{ config['database'] }} -c "CREATE SCHEMA IF NOT EXISTS {{ config['schemaname'] }} AUTHORIZATION {{ config['username'] }};"
+    - runas: postgres
+    - require:
+      - cmd: createuser-{{ config['username'] }}
+      - cmd: createdb-{{ config['database'] }}
 {% endfor %}
