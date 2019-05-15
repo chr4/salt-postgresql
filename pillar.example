@@ -68,11 +68,11 @@ postgresql:
       password:
 
   databases:
-    - database: raw_data
-      username: raw
+    - database: triebwerk
+      username: deploy
       gisdb: true
 
   schemas:
-    - schemaname: osm
-      username: osm
-      database: raw_data
+    - schemaname: test
+      username: user_with_password
+      database: triebwerk
