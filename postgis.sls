@@ -3,7 +3,7 @@ postgis:
   pkg.installed:
      - pkgs: [postgresql-{{ pillar['postgresql']['version'] }}-postgis-{{ pillar['postgresql']['postgis']['version'] }}]
 
-{% for config in pillar['postgresql']['database'] %}
+{% for config in pillar['postgresql']['databases'] %}
   {% if config['gisdb'] %}
 postgis-extension-{{ loop.index }}:
   cmd.run:
