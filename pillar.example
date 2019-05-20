@@ -45,27 +45,22 @@ postgresql:
     shared_buffers: 128MB
     maintenance_work_mem: 64MB
     effective_cache_size: 4GB
+  
+  # These lists will be written in the pg_hba.conf
+  # Accepted shape:   
+  #  - ['host/local', 'DATABASE',  'USER',  'ADDRESS', 'METHOD']
 
-  # These users will be created and added to pg_hba.conf
+  acls:
+    - ['host', 'triebwerk', 'deploy', '10.14.38.0/24', 'trust']
+    - ['host', 'triebwerk', 'user_wwith_password', '10.14.38.0/24', 'password']
+    - ['host', 'repliction', 'replicant', '10.14.38.0/24', 'trust']
+
   users:
     - username: deploy
-      type: host
-      database: triebwerk
-      address: 10.14.38.0/24
-      method: trust
     - username: user_with_password
-      type: host
-      database: triebwerk
-      address: 10.14.38.0/24
-      method: trust
       options: PASSWORD 'supersecret' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN
     - username: replicant
-      type: host
-      database: replication
-      address: 10.14.38.0/24
-      method: trust
       options: NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN REPLICATION
-      password:
 
   databases:
     - database: triebwerk

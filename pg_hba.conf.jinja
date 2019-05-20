@@ -1,6 +1,6 @@
 # TYPE  DATABASE  USER      ADDRESS  METHOD
 local   all       postgres           trust
 
-{%- for config in pillar['postgresql']['users']|default({}) %}
-{{ config['type'] }} {{ config['database'] }} {{ config['username'] }} {{ config['address']|default('') }} {{ config['method'] }}
+{%- for acl in pillar['postgresql']['acls']|default({}) %}
+{{ '{0:<7} {1:<15} {2:<15} {3:<23} {4}'.format(*acl) }}
 {%- endfor -%}
