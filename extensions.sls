@@ -1,0 +1,15 @@
+# Install postgres extensions
+postgis:
+  pkg.installed:
+     - pkgs: [postgresql-{{ pillar['postgresql']['version'] }}-postgis-{{ pillar['postgresql']['postgis']['version'] }}]
+
+{% for database in pillar['postgresql']['databases'] %}
+  {% for extension in database['extensions'] %}
+postgres-extension-{{ database['database'] }}-{{ loop.index }}:
+  cmd.run:
+    - name: psql -d {{ database['database'] }} -t -c "CREATE EXTENSION IF NOT EXISTS {{ extension }};"
+    - runas: postgres
+    - require:
+      - pkg: postgis
+  {% endfor %}
+{% endfor %}

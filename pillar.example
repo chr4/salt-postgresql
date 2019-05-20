@@ -69,10 +69,8 @@ postgresql:
 
   databases:
     - database: triebwerk
-      username: deploy
-      gisdb: true
-
-  schemas:
-    - schemaname: test
-      username: user_with_password
-      database: triebwerk
+      owner: deploy
+      schemas:
+      - schemaname: test
+        user: user_with_password
+      extensons: [postgis]

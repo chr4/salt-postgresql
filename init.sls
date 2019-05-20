@@ -83,20 +83,20 @@ createuser-{{ config['username'] }}:
 {% if config['database'] != "replication" %}
 createdb-{{ config['database'] }}:
   cmd.run:
-    - name: psql -t -c "CREATE DATABASE {{ config['database'] }} OWNER {{ config['username'] }};"
+    - name: psql -t -c "CREATE DATABASE {{ config['database'] }} OWNER {{ config['owner'] }};"
     - unless: psql -t -c "SELECT 1 FROM pg_database WHERE datname='{{ config['database'] }}'" |grep -q 1
     - runas: postgres
     - require:
-      - cmd: createuser-{{ config['username'] }}
+      - cmd: createuser-{{ config['owner'] }}
 {% endif %}
-{% endfor %}
 
-{% for config in pillar['postgresql']['schemas']|default({}) %}
-createschema-{{ config['schemaname'] }}:
+{% for schema in config['schemas']|default({}) %}
+createschema-{{ schema['schemaname'] }}:
   cmd.run:
-    - name: psql -t -d {{ config['database'] }} -c "CREATE SCHEMA IF NOT EXISTS {{ config['schemaname'] }} AUTHORIZATION {{ config['username'] }};"
+    - name: psql -t -d {{ config['database'] }} -c "CREATE SCHEMA IF NOT EXISTS {{ schema['schemaname'] }} AUTHORIZATION {{ schema['user'] }};"
     - runas: postgres
     - require:
-      - cmd: createuser-{{ config['username'] }}
+      - cmd: createuser-{{ config['owner'] }}
       - cmd: createdb-{{ config['database'] }}
+{% endfor %}
 {% endfor %}
