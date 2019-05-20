@@ -93,7 +93,8 @@ createdb-{{ config['database'] }}:
 {% for schema in config['schemas']|default({}) %}
 createschema-{{ schema['schemaname'] }}:
   cmd.run:
-    - name: psql -t -d {{ config['database'] }} -c "CREATE SCHEMA IF NOT EXISTS {{ schema['schemaname'] }} AUTHORIZATION {{ schema['user'] }};"
+    - name: psql -t -d {{ config['database'] }} -c "CREATE SCHEMA {{ schema['schemaname'] }} AUTHORIZATION {{ schema['user'] }};"
+    - unless: psql -t -c "SELECT 1 FROM pg_catalog.pg_namespace WHERE nspname='{{ schema['schemaname'] }}'" |grep -q 1
     - runas: postgres
     - require:
       - cmd: createuser-{{ config['owner'] }}

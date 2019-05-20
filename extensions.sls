@@ -7,7 +7,8 @@ postgis:
   {% for extension in database['extensions'] %}
 postgres-extension-{{ database['database'] }}-{{ loop.index }}:
   cmd.run:
-    - name: psql -d {{ database['database'] }} -t -c "CREATE EXTENSION IF NOT EXISTS {{ extension }};"
+    - name: psql -d {{ database['database'] }} -t -c "CREATE EXTENSION {{ extension }};"
+    - unless: psql -t -c "SELECT 1 FROM pg_extension WHERE extname='{{ extension }}'" |grep -q 1
     - runas: postgres
     - require:
       - pkg: postgis
