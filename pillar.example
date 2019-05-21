@@ -66,3 +66,12 @@ postgresql:
       method: trust
       options: NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN REPLICATION
       password:
+
+    # If you want multiple databases for a user, you can use a for loop
+    {% for db in ['staging', 'test'] %}
+    - username: deploy
+      type: host
+      database: {{ db }}
+      address: 10.14.38.0/24
+      method: trust
+    {% endfor %}
