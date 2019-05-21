@@ -78,7 +78,7 @@ createuser-{{ loop.index }}:
     - unless: psql -t -c "SELECT 1 FROM pg_roles WHERE rolname='{{ config['username'] }}'" |grep -q 1
     - runas: postgres
 
-# The "replication" keyword is not a real database, but just used for permissions in pg_hba.conf
+# The "replication" keyword is not a real database but a special keyword used for replication permissions in pg_hba.conf
 {% if config['database'] != "replication" %}
 createdb-{{ loop.index }}:
   cmd.run:
