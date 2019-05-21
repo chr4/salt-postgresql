@@ -1,7 +1,7 @@
 # vim: ft=yaml
 
 postgresql:
-  version: 10
+  version: 11
 
   # Call reload action instead of restart upon configuration changes.
   # This defaults to "true", as restarts result in a short downtime
