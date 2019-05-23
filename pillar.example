@@ -47,6 +47,8 @@ postgresql:
     effective_cache_size: 4GB
 
   # These users will be created and added to pg_hba.conf
+  # NOTE: If you create multiple users with access to the same database, the first user listed
+  #       here will become the owner
   users:
     - username: deploy
       type: host
