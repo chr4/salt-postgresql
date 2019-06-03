@@ -47,12 +47,15 @@ chown_pgdata:
       wal_level: replica
       wal_log_hints: false
       max_wal_senders: 5 # NOTE: Since postgresql-10, the default is 10
+      log_autovacuum_min_duration: '500ms'
     - context:
       # Override defaults from pillar configuration
 {% for key in [
   'listen_addresses', 'work_mem', 'shared_buffers', 'maintenance_work_mem',
   'effective_cache_size', 'archive_command', 'wal_level', 'wal_log_hints', 'max_wal_senders',
-  'wal_keep_segments', 'wal_buffers'
+  'wal_keep_segments', 'wal_buffers', 'autovacuum_vacuum_cost_delay',
+  'autovacuum_vacuum_cost_limit', 'log_autovacuum_min_duration', 'autovacuum_vacuum_threshold',
+  'autovacuum_vacuum_scale_factor'
   ] %}
   {% set value = salt['pillar.get']('postgresql:config:' + key, undefined) %}
   {% if value is defined %}

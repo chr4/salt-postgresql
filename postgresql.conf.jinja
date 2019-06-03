@@ -75,20 +75,20 @@ constraint_exclusion = off
 # that these commands do not significantly interfere with the ability of the system to perform other
 # database operations. Cost-based vacuum delay provides a way for administrators to achieve this.
 autovacuum = on
-autovacuum_vacuum_cost_delay = '20ms'
-autovacuum_vacuum_cost_limit = 200
+autovacuum_vacuum_cost_delay = '{{ autovacuum_vacuum_cost_delay }}'
+autovacuum_vacuum_cost_limit = {{ autovacuum_vacuum_cost_limit}}
 
 # Log autovacuum tasks that are taking longer than 500ms
-log_autovacuum_min_duration = '500ms'
+log_autovacuum_min_duration = '{{ log_autovacuum_min_duration }}'
 
 # Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one
 # table. The default is 50
 # (This in practise only applies to very small tables)
-autovacuum_vacuum_threshold = 200
+autovacuum_vacuum_threshold = {{ autovacuum_vacuum_threshold }}
 
 # Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether
 # to trigger a VACUUM. The default is 0.2 (20% of table size).
-autovacuum_vacuum_scale_factor = 0.01
+autovacuum_vacuum_scale_factor = {{ autovacuum_vacuum_scale_factor }}
 
 # Specifies the amount of memory to be used by internal sort operations and hash tables before
 # writing to temporary disk files. Note that for a complex query, several sort or hash operations
