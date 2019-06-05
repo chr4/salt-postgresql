@@ -47,6 +47,10 @@ chown_pgdata:
       wal_level: replica
       wal_log_hints: false
       max_wal_senders: 5 # NOTE: Since postgresql-10, the default is 10
+      autovacuum_vacuum_cost_delay: '20ms'
+      autovacuum_vacuum_cost_limit: -1
+      autovacuum_vacuum_threshold: 50
+      autovacuum_vacuum_scale_factor: 0.2
       log_autovacuum_min_duration: '500ms'
     - context:
       # Override defaults from pillar configuration
