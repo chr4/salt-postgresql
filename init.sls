@@ -24,6 +24,18 @@ chown_pgdata:
     - user: postgres
     - group: postgres
 
+# Deploy certificates
+{% for file, _ in salt['pillar.get']('postgresql:certificates', {})|dictsort %}
+/var/lib/postgresql/{{ version }}/main/{{ file }}:
+  file.managed:
+    - require:
+      - pkg: postgresql
+    - mode: 600
+    - user: postgres
+    - group: postgres
+    - contents_pillar: postgresql:certificates:{{ file }}
+{% endfor %}
+
 # Deploy configuration
 /etc/postgresql/{{ version }}/main/postgresql.conf:
   file.managed:
@@ -45,6 +57,7 @@ chown_pgdata:
       maintenance_work_mem: {{ (grains['mem_total'] / 1024 * 50)|int }}MB
       effective_cache_size: {{ (grains['mem_total'] * 0.8)|int }}MB
       wal_level: replica
+      ssl: false
       wal_log_hints: false
       max_wal_senders: 5 # NOTE: Since postgresql-10, the default is 10
       autovacuum_vacuum_cost_delay: '20ms'
@@ -59,7 +72,7 @@ chown_pgdata:
   'effective_cache_size', 'archive_command', 'wal_level', 'wal_log_hints', 'max_wal_senders',
   'wal_keep_segments', 'wal_buffers', 'autovacuum_vacuum_cost_delay',
   'autovacuum_vacuum_cost_limit', 'log_autovacuum_min_duration', 'autovacuum_vacuum_threshold',
-  'autovacuum_vacuum_scale_factor'
+  'autovacuum_vacuum_scale_factor', 'ssl', 'ssl_ca_file', 'ssl_cert_file', 'ssl_key_file'
   ] %}
   {% set value = salt['pillar.get']('postgresql:config:' + key, undefined) %}
   {% if value is defined %}

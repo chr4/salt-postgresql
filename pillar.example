@@ -21,6 +21,7 @@ postgresql:
   config:
     {% set max_connections = 100 %}
     listen_addresses: "''"
+    ssl: false
     max_connections: {{ max_connections }}
     work_mem: {{ (grains['mem_total'] * 0.9 / max_connections)|int }}MB
     shared_buffers: {{ (grains['mem_total'] * 0.1)|int }}MB
@@ -45,6 +46,18 @@ postgresql:
     shared_buffers: 128MB
     maintenance_work_mem: 64MB
     effective_cache_size: 4GB
+
+  # SSL certificate
+  # NOTE: Server must be restarted manually after a change!
+  certificates:
+    server.crt: |
+      -----BEGIN CERTIFICATE-----
+      [...]
+      -----END CERTIFICATE-----
+    server.key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      [...]
+      -----END RSA PRIVATE KEY-----
 
   # These users will be created and added to pg_hba.conf
   # NOTE: If you create multiple users with access to the same database, the first user listed
