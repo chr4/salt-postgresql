@@ -48,6 +48,8 @@ chown_pgdata:
       wal_log_hints: false
       max_wal_senders: 5 # NOTE: Since postgresql-10, the default is 10
       log_autovacuum_min_duration: '500ms'
+      logging_collector: false
+
     - context:
       # Override defaults from pillar configuration
 {% for key in [
