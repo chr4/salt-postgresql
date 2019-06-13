@@ -45,6 +45,10 @@ postgresql:
     shared_buffers: 128MB
     maintenance_work_mem: 64MB
     effective_cache_size: 4GB
+    autovacuum_vacuum_cost_delay: 20ms
+    autovacuum_vacuum_cost_limit: -1
+    autovacuum_vacuum_threshold: 50
+    autovacuum_vacuum_scale_factor: 0.2
 
   # These users will be created and added to pg_hba.conf
   # NOTE: If you create multiple users with access to the same database, the first user listed
