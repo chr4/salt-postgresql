@@ -328,7 +328,7 @@ log_statement = 'none'
 
 # This parameter enables the logging collector, which is a background process that captures log
 # messages sent to stderr and redirects them into log files.
-{% if logging_collector %}
+{% if logging_collector is defined %}
 logging_collector = on
 
 {% if log_directory is defined %}
