@@ -339,7 +339,8 @@ log_statement = '{{ log_statement }}'
 # In contrast, syslog prefers to drop messages if it cannot write them, which means it may fail to log some messages
 # in such cases but it will not block the rest of the system.
 {%- if logging_collector is defined %}
-logging_collector = on
+logging_collector = {{ logging_collector }}
+{%- endif %}
 
 {%- if log_directory is defined %}
 log_directory = '{{ log_directory }}'
@@ -347,7 +348,6 @@ log_directory = '{{ log_directory }}'
 
 {%- if log_filename is defined %}
 log_filename = '{{ log_filename }}'
-{%- endif %}
 {%- endif %}
 
 # Selects the text search configuration that is used by those variants of the text search functions
