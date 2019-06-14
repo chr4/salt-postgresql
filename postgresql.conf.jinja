@@ -320,11 +320,9 @@ log_timezone = 'Europe/Berlin'
 # ddl logs all data definition statements, such as CREATE, ALTER, and DROP statements. mod logs all ddl
 # statements, plus data-modifying statements such as INSERT, UPDATE, DELETE, TRUNCATE, and COPY FROM. PREPARE, 
 # EXECUTE, and EXPLAIN ANALYZE statements are also logged if their contained command is of an appropriate type. 
-{% if log_statement is defined %}
+{%- if log_statement is defined %}
 log_statement = '{{ log_statement }}'
-{% else %}
-log_statement = 'none'
-{% endif %}
+{%- endif %}
 
 # This parameter enables the logging collector, which is a background process that captures log
 # messages sent to stderr and redirects them into log files. This approach is often more useful than logging to syslog,
@@ -340,20 +338,17 @@ log_statement = 'none'
 # server processes could be blocked while trying to send additional log messages when the collector has fallen behind.
 # In contrast, syslog prefers to drop messages if it cannot write them, which means it may fail to log some messages
 # in such cases but it will not block the rest of the system.
-{% if logging_collector is defined %}
+{%- if logging_collector is defined %}
 logging_collector = on
 
-{% if log_directory is defined %}
+{%- if log_directory is defined %}
 log_directory = '{{ log_directory }}'
-{% endif %}
+{%- endif %}
 
-{% if log_filename is defined %}
+{%- if log_filename is defined %}
 log_filename = '{{ log_filename }}'
-{% endif %}
-
-{% else %}
-logging_collector = off
-{% endif %}
+{%- endif %}
+{%- endif %}
 
 # Selects the text search configuration that is used by those variants of the text search functions
 # that do not have an explicit argument specifying the configuration. The built-in default is
