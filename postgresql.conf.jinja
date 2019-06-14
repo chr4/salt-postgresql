@@ -316,6 +316,33 @@ log_min_duration_statement = '1500ms'
 log_line_prefix = '%m [%p] %q%u@%d '
 log_timezone = 'Europe/Berlin'
 
+# Controls which SQL statements are logged. Valid values are none (off), ddl, mod, and all (all statements).
+# ddl logs all data definition statements, such as CREATE, ALTER, and DROP statements. mod logs all ddl
+# statements, plus data-modifying statements such as INSERT, UPDATE, DELETE, TRUNCATE, and COPY FROM. PREPARE, 
+# EXECUTE, and EXPLAIN ANALYZE statements are also logged if their contained command is of an appropriate type. 
+{% if log_statement is defined %}
+log_statement = '{{ log_statement }}'
+{% else %}
+log_statement = 'none'
+{% endif %}
+
+# This parameter enables the logging collector, which is a background process that captures log
+# messages sent to stderr and redirects them into log files.
+{% if logging_collector %}
+logging_collector = on
+
+{% if log_directory is defined %}
+log_directory = '{{ log_directory }}'
+{% endif %}
+
+{% if log_filename is defined %}
+log_filename = '{{ log_filename }}'
+{% endif %}
+
+{% else %}
+logging_collector = off
+{% endif %}
+
 # Selects the text search configuration that is used by those variants of the text search functions
 # that do not have an explicit argument specifying the configuration. The built-in default is
 # pg_catalog.simple, but initdb will initialize the configuration file with a setting that

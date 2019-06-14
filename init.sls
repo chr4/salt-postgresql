@@ -65,6 +65,8 @@ chown_pgdata:
       autovacuum_vacuum_threshold: 50
       autovacuum_vacuum_scale_factor: 0.2
       log_autovacuum_min_duration: '500ms'
+      logging_collector: false
+
     - context:
       # Override defaults from pillar configuration
 {% for key in [
@@ -72,7 +74,8 @@ chown_pgdata:
   'effective_cache_size', 'archive_command', 'wal_level', 'wal_log_hints', 'max_wal_senders',
   'wal_keep_segments', 'wal_buffers', 'autovacuum_vacuum_cost_delay',
   'autovacuum_vacuum_cost_limit', 'log_autovacuum_min_duration', 'autovacuum_vacuum_threshold',
-  'autovacuum_vacuum_scale_factor', 'ssl', 'ssl_ca_file', 'ssl_cert_file', 'ssl_key_file'
+  'autovacuum_vacuum_scale_factor', 'ssl', 'ssl_ca_file', 'ssl_cert_file', 'ssl_key_file',
+  'log_statement', 'log_directory', 'log_filename', 'logging_collector'
   ] %}
   {% set value = salt['pillar.get']('postgresql:config:' + key, undefined) %}
   {% if value is defined %}
