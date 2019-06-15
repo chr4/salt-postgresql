@@ -34,8 +34,9 @@ postgresql:
     wal_keep_segments: (unset)
     wal_buffers: (unset)
 
-    log_statement: 'none'
+    log_statement: none
     logging_collector: off
+
     # NOTE: Only relevant when logging_collector is on
     log_directory: (unset)
     log_filename: (unset)
