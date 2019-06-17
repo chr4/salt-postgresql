@@ -35,7 +35,7 @@ postgresql:
     wal_buffers: (unset)
 
     log_statement: none
-    logging_collector: off
+    logging_collector: false
 
     # NOTE: Only relevant when logging_collector is on
     log_directory: (unset)

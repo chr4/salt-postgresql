@@ -316,14 +316,15 @@ log_min_duration_statement = '1500ms'
 log_line_prefix = '%m [%p] %q%u@%d '
 log_timezone = 'Europe/Berlin'
 
+{%- if log_statement is defined %}
 # Controls which SQL statements are logged. Valid values are none (off), ddl, mod, and all (all statements).
 # ddl logs all data definition statements, such as CREATE, ALTER, and DROP statements. mod logs all ddl
 # statements, plus data-modifying statements such as INSERT, UPDATE, DELETE, TRUNCATE, and COPY FROM. PREPARE, 
 # EXECUTE, and EXPLAIN ANALYZE statements are also logged if their contained command is of an appropriate type. 
-{%- if log_statement is defined %}
 log_statement = '{{ log_statement }}'
 {%- endif %}
 
+{%- if logging_collector is defined %}
 # This parameter enables the logging collector, which is a background process that captures log
 # messages sent to stderr and redirects them into log files. This approach is often more useful than logging to syslog,
 # since some types of messages might not appear in syslog output. (One common example is dynamic-linker failure messages;
@@ -338,8 +339,11 @@ log_statement = '{{ log_statement }}'
 # server processes could be blocked while trying to send additional log messages when the collector has fallen behind.
 # In contrast, syslog prefers to drop messages if it cannot write them, which means it may fail to log some messages
 # in such cases but it will not block the rest of the system.
-{%- if logging_collector is defined %}
-logging_collector = {{ logging_collector }}
+{%- if logging_collector %}
+logging_collector = on
+{% else %}
+logging_collector = off
+{%- endif %}
 {%- endif %}
 
 {%- if log_directory is defined %}
