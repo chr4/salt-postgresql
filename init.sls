@@ -47,38 +47,51 @@ chown_pgdata:
     - source: salt://{{ slspath }}/postgresql.conf.jinja
     - template: jinja
     - defaults:
-      # These are the defaults, which can be overridden by pillars
-      version: {{ version }}
-      listen_addresses: ''
-      {% set max_connections = salt['pillar.get']('postgresql:config:max_connections', 100) %}
-      max_connections: {{ max_connections }}
-      work_mem: {{ (grains['mem_total'] * 0.9 / max_connections)|int }}MB
-      shared_buffers: {{ (grains['mem_total'] * 0.1)|int }}MB
-      maintenance_work_mem: {{ (grains['mem_total'] / 1024 * 50)|int }}MB
-      effective_cache_size: {{ (grains['mem_total'] * 0.8)|int }}MB
-      wal_level: replica
-      ssl: false
-      wal_log_hints: false
-      max_wal_senders: 5 # NOTE: Since postgresql-10, the default is 10
-      autovacuum_vacuum_cost_delay: '20ms'
-      autovacuum_vacuum_cost_limit: -1
-      autovacuum_vacuum_threshold: 50
-      autovacuum_vacuum_scale_factor: 0.2
-      log_autovacuum_min_duration: '500ms'
+      config:
+        # Default settings of the postgresql package from PGDG
+        cluster_name: {{ version }}/main
+        data_directory: /var/lib/postgresql/{{ version }}/main
+        datestyle: iso, mdy
+        default_text_search_config: pg_catalog.english
+        dynamic_shared_memory_type: posix
+        external_pid_file: /var/run/postgresql/{{ version }}-main.pid
+        hba_file: /etc/postgresql/{{ version }}/main/pg_hba.conf
+        ident_file: /etc/postgresql/{{ version }}/main/pg_ident.conf
+        include_dir: conf.d
+        lc_messages: C.UTF-8
+        lc_monetary: C.UTF-8
+        lc_numeric: C.UTF-8
+        lc_time: C.UTF-8
+        log_line_prefix: '%m [%p] %q%u@%d '
+        log_timezone: localtime
+        max_connections: 100
+        max_wal_size: 1GB
+        min_wal_size: 80MB
+        port: 5432
+        shared_buffers: 128MB
+        ssl: on
+        ssl_cert_file: /etc/ssl/certs/ssl-cert-snakeoil.pem
+        ssl_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
+        stats_temp_directory: /var/run/postgresql/{{ version }}-main.pg_stat_tmp
+        timezone: localtime
+        unix_socket_directories: /var/run/postgresql
+
+    # Overwrite default options and add additional ones according to pillar
     - context:
-      # Override defaults from pillar configuration
-{% for key in [
-  'listen_addresses', 'work_mem', 'shared_buffers', 'maintenance_work_mem',
-  'effective_cache_size', 'archive_command', 'wal_level', 'wal_log_hints', 'max_wal_senders',
-  'wal_keep_segments', 'wal_buffers', 'autovacuum_vacuum_cost_delay',
-  'autovacuum_vacuum_cost_limit', 'log_autovacuum_min_duration', 'autovacuum_vacuum_threshold',
-  'autovacuum_vacuum_scale_factor', 'ssl', 'ssl_ca_file', 'ssl_cert_file', 'ssl_key_file'
-  ] %}
-  {% set value = salt['pillar.get']('postgresql:config:' + key, undefined) %}
-  {% if value is defined %}
-      {{ key }}: {{ value }}
-  {% endif %}
-{% endfor %}
+{% if salt['pillar.get']('postgresql:config', undefined) is defined %}
+      config_override:
+  {% for key, value in pillar['postgresql']['config']|dictsort %}
+        # Strings will be escaped with '' in postgresql.conf.jinja
+        # It's ok to escape enums as well, also it's ok to use True and False as booleans
+        #
+        # https://www.postgresql.org/docs/11/config-setting.html
+        {{ key }}: {{ value }}
+  {% endfor %}
+
+{% else %}
+      # Make sure config_override is present when no options are defined by pillar
+      config_override: {}
+{% endif %}
 
 /etc/postgresql/{{ version }}/main/pg_hba.conf:
   file.managed:
