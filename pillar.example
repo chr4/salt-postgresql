@@ -79,24 +79,30 @@ postgresql:
   # NOTE: If you create multiple users with access to the same database, the first user listed
   #       here will become the owner
   users:
-    - username: deploy
-      type: host
-      database: production
-      address: 10.1.2.0/24
-      method: trust
     - username: user_with_password
       type: host
       database: production
       address: 10.1.2.0/24
       method: trust
-      options: PASSWORD 'supersecret' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN
+    - username: example_role
+      type: host
+      database: production
+      address: 10.1.2.0/24
+      method: trust
+      login: false
+    - username: example_user_with_role
+      type: host
+      database: production
+      address: 10.1.2.0/24
+      method: trust
+      groups:
+        - example_role
     - username: replicant
       type: host
       database: replication
       address: 10.1.2.0/24
-      method: trust
-      options: NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN REPLICATION
-      password:
+      method: md5
+      password: password
 
     # If you want multiple databases for a user, you can use a for loop
     {% for db in ['staging', 'test'] %}
