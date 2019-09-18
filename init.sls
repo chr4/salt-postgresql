@@ -104,9 +104,7 @@ chown_pgdata:
       - pkg: postgresql
 
 # Deploy users. Sort them, so order is not changing between salt runs
-# Reverse the order so the first user defined in the pillar is database owner as in previous versions,
-# since postgres_database.present updates ownership in every iteration
-{% for config in pillar['postgresql']['users']|default({})|reverse %}
+{% for config in pillar['postgresql']['users']|default({}) %}
 createuser-{{ loop.index }}:
   postgres_user.present:
     - name: {{ config['username'] }}
@@ -118,7 +116,7 @@ createuser-{{ loop.index }}:
     - superuser: {{ config['superuser']|default(false) }}
     - createdb: {{ config['createdb']|default(false) }}
     - createroles: {{ config['createroles']|default(false) }}
-    - inherit: {{ config['inherit']|default(false) }}
+    - inherit: {{ config['inherit']|default(true) }}
     - replication: {{ config['replication']|default(false) }}
     {% if config['groups'] is defined %}
     - groups:

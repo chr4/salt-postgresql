@@ -76,7 +76,7 @@ postgresql:
 
 
   # These users will be created and added to pg_hba.conf
-  # NOTE: If you create multiple users with access to the same database, the first user listed
+  # NOTE: If you create multiple users with access to the same database, the last user listed
   #       here will become the owner
   users:
     - username: user_with_password
@@ -84,6 +84,12 @@ postgresql:
       database: production
       address: 10.1.2.0/24
       method: trust
+      # NOTE: The following values represent the defaults
+      superuser: false
+      createdb: false
+      createroles: false
+      inherit: true
+      replication: false
     - username: example_role
       type: host
       database: production
@@ -101,6 +107,7 @@ postgresql:
       type: host
       database: replication
       address: 10.1.2.0/24
+      replication: true
       method: md5
       password: password
 
