@@ -13,10 +13,6 @@ postgresql:
   postgis:
     version: 2.3
 
-  # You can also disable unattended upgrades (default is enabled)
-  # (Ubuntu only, requires unattended-upgrades package to be installed)
-  unattended_upgrades: false
-
   # Configure postgresql.conf settings
   #
   # When not specified here, the default settings of the postgresql package from PGDG on

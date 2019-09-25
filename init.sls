@@ -122,18 +122,3 @@ createdb-{{ loop.index }}:
       - cmd: createuser-{{ loop.index }}
 {% endif %}
 {% endfor %}
-
-
-# Disable automatic updates. This broke production once.
-{% if salt['pillar.get']('postgresql:unattended_upgrades', true) == false %}
-postgresql_disable_unattended_upgrades:
-  file.replace:
-    - name: /etc/apt/apt.conf.d/50unattended-upgrades
-    - pattern: |
-        Unattended-Upgrade::Package-Blacklist {
-    - repl: |
-        Unattended-Upgrade::Package-Blacklist {
-          "postgresql-.*";
-    - unless: grep -q 'postgresql-.*' /etc/apt/apt.conf.d/50unattended-upgrades
-    - onlyif: test -f /etc/apt/apt.conf.d/50unattended-upgrades
-{% endif %}
