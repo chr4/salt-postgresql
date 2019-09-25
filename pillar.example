@@ -80,12 +80,15 @@ postgresql:
       database: production
       address: 10.1.2.0/24
       method: trust
+      password: password
+
       # NOTE: The following values represent the defaults
       superuser: false
       createdb: false
       createroles: false
       inherit: true
       replication: false
+
     - username: example_role
       type: host
       database: production
@@ -105,7 +108,6 @@ postgresql:
       address: 10.1.2.0/24
       replication: true
       method: md5
-      password: password
 
     # If you want multiple databases for a user, you can use a for loop
     {% for db in ['staging', 'test'] %}
