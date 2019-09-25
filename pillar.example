@@ -72,27 +72,40 @@ postgresql:
 
 
   # These users will be created and added to pg_hba.conf
-  # NOTE: If you create multiple users with access to the same database, the first user listed
+  # NOTE: If you create multiple users with access to the same database, the last user listed
   #       here will become the owner
   users:
-    - username: deploy
-      type: host
-      database: production
-      address: 10.1.2.0/24
-      method: trust
     - username: user_with_password
       type: host
       database: production
       address: 10.1.2.0/24
       method: trust
-      options: PASSWORD 'supersecret' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN
+      # NOTE: The following values represent the defaults
+      superuser: false
+      createdb: false
+      createroles: false
+      inherit: true
+      replication: false
+    - username: example_role
+      type: host
+      database: production
+      address: 10.1.2.0/24
+      method: trust
+      login: false
+    - username: example_user_with_role
+      type: host
+      database: production
+      address: 10.1.2.0/24
+      method: trust
+      groups:
+        - example_role
     - username: replicant
       type: host
       database: replication
       address: 10.1.2.0/24
-      method: trust
-      options: NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN REPLICATION
-      password:
+      replication: true
+      method: md5
+      password: password
 
     # If you want multiple databases for a user, you can use a for loop
     {% for db in ['staging', 'test'] %}

@@ -106,19 +106,41 @@ chown_pgdata:
 # Deploy users. Sort them, so order is not changing between salt runs
 {% for config in pillar['postgresql']['users']|default({}) %}
 createuser-{{ loop.index }}:
-  cmd.run:
-    - name: psql -t -c "CREATE ROLE {{ config['username'] }} {{ config['options']|default('NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN') }};"
-    - unless: psql -t -c "SELECT 1 FROM pg_roles WHERE rolname='{{ config['username'] }}'" |grep -q 1
-    - runas: postgres
+  postgres_user.present:
+    - name: {{ config['username'] }}
+    - encrypted: True
+    - login: {{ config['login']|default(true) }}
+    {% if config['password'] is defined %}
+    - password: {{ config['password'] }}
+    {% endif %}
+    - superuser: {{ config['superuser']|default(false) }}
+    - createdb: {{ config['createdb']|default(false) }}
+    - createroles: {{ config['createroles']|default(false) }}
+    - inherit: {{ config['inherit']|default(true) }}
+    - replication: {{ config['replication']|default(false) }}
+    {% if config['groups'] is defined %}
+    - groups:
+    {% for group in config['groups']|default({}) %}
+        - {{ group }}
+    {% endfor %}
+    {% endif %}
+    - user: postgres
 
 # The "replication" keyword is not a real database but a special keyword used for replication permissions in pg_hba.conf
 {% if config['database'] != "replication" %}
 createdb-{{ loop.index }}:
-  cmd.run:
-    - name: psql -t -c "CREATE DATABASE {{ config['database'] }} OWNER {{ config['username'] }};"
-    - unless: psql -t -c "SELECT 1 FROM pg_database WHERE datname='{{ config['database'] }}'" |grep -q 1
-    - runas: postgres
-    - require:
-      - cmd: createuser-{{ loop.index }}
+  postgres_database.present:
+    - name: {{ config['database'] }}
+    - owner: {{ config['username'] }}
+    {% if config['tablespace'] is defined %}
+    - tablespace: {{ config['tablespace'] }}
+    {% endif %}
+    {% if config['encoding'] is defined %}
+    - encoding: {{ config['encoding'] }}
+    {% endif %}
+    {% if config['template'] is defined %}
+    - template: {{ config['template'] }}
+    {% endif %}
+    - user: postgres
 {% endif %}
 {% endfor %}
