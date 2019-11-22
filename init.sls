@@ -128,6 +128,9 @@ createuser-{{ loop.index }}:
 
 # The "replication" keyword is not a real database but a special keyword used for replication permissions in pg_hba.conf
 {% if config['database'] != "replication" %}
+
+# Do not create table for read-only users, assume it's there already
+{% if not config['read_only']|default(false) %}
 createdb-{{ loop.index }}:
   postgres_database.present:
     - name: {{ config['database'] }}
@@ -142,5 +145,53 @@ createdb-{{ loop.index }}:
     - template: {{ config['template'] }}
     {% endif %}
     - user: postgres
+
+{% endif %}
+{% endif %}
+
+# Grant read-only permissions to database if read_only flag is set
+{% if config['read_only']|default(false) %}
+
+# Revoke default CREATE privilege. By default, any role can create objects in the public schema
+revoke_create_on_schema_public-{{ loop.index }}:
+  postgres_privileges.absent:
+    - name: {{ config['username'] }}
+    - object_name: public
+    - object_type: schema
+    - privileges: [CREATE]
+    - maintenance_db: {{ config['database'] }}
+
+grant_usage_on_schema_public-{{ loop.index }}:
+  postgres_privileges.present:
+    - name: {{ config['username'] }}
+    - object_name: public
+    - object_type: schema
+    - privileges: [USAGE]
+    - maintenance_db: {{ config['database'] }}
+
+grant_connect_to_database-{{ loop.index }}:
+  postgres_privileges.present:
+    - name: {{ config['username'] }}
+    - object_name: {{ config['database'] }}
+    - object_type: database
+    - privileges: [CONNECT]
+
+grant_table_select-{{ loop.index }}:
+  postgres_privileges.present:
+    - name: {{ config['username'] }}
+    - object_name: ALL
+    - object_type: table
+    - privileges: [SELECT]
+    - prepend: public
+    - maintenance_db: {{ config['database'] }}
+
+# Change default privileges, so read-only user also has access to newly created tables
+# There's a salt modules for this, but it's not yet released: https://github.com/saltstack/salt/pull/51904/files
+# Information for querying the default privleges: https://stackoverflow.com/a/14555063
+alter_default_privileges-{{ loop.index }}:
+ cmd.run:
+    - name: psql {{ config['database'] }} -t -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO {{ config['username'] }};"
+    - unless: psql {{ config['database'] }} -t -c "SELECT 1 FROM pg_default_acl a JOIN pg_namespace b ON a.defaclnamespace=b.oid WHERE defaclacl='{ {{ config['username'] }}=r/postgres }'" |grep -q 1
+    - runas: postgres
 {% endif %}
 {% endfor %}

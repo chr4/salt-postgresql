@@ -89,12 +89,23 @@ postgresql:
       inherit: true
       replication: false
 
+    # Create a read-only user
+    # NOTE: This requires that the database was alreay created by a non-read-only user before
+    - username: read_only_user
+      type: host
+      database: production
+      address: 10.1.2.0/24
+      method: trust
+      password: password
+      read_only: true
+
     - username: example_role
       type: host
       database: production
       address: 10.1.2.0/24
       method: trust
       login: false
+
     - username: example_user_with_role
       type: host
       database: production
@@ -102,6 +113,7 @@ postgresql:
       method: trust
       groups:
         - example_role
+
     - username: replicant
       type: host
       database: replication
