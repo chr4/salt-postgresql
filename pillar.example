@@ -82,6 +82,10 @@ postgresql:
       method: trust
       password: password
 
+      # You can specify another owner for the database if required.
+      # If db_owner is not set, it will default to the "username" setting above
+      db_owner: another_owner
+
       # NOTE: The following values represent the defaults
       superuser: false
       createdb: false

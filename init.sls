@@ -134,7 +134,7 @@ createuser-{{ loop.index }}:
 createdb-{{ loop.index }}:
   postgres_database.present:
     - name: {{ config['database'] }}
-    - owner: {{ config['username'] }}
+    - owner: {{ config['db_owner']|default(config['username']) }}
     {% if config['tablespace'] is defined %}
     - tablespace: {{ config['tablespace'] }}
     {% endif %}
