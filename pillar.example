@@ -103,6 +103,13 @@ postgresql:
       password: password
       read_only: true
 
+    - username: owner
+      type: host
+      database: db_with_extension
+      extensions: [pgcrypto]
+      address: all
+      method: trust
+
     - username: example_role
       type: host
       database: production
@@ -121,6 +128,7 @@ postgresql:
     - username: replicant
       type: host
       database: replication
+      extensions: []
       address: 10.1.2.0/24
       replication: true
       method: md5

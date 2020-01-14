@@ -105,7 +105,9 @@ chown_pgdata:
 
 # Deploy users. Sort them, so order is not changing between salt runs
 {% for config in pillar['postgresql']['users']|default({}) %}
-createuser-{{ loop.index }}:
+{% set index = loop.index %}
+
+createuser-{{ index }}:
   postgres_user.present:
     - name: {{ config['username'] }}
     - encrypted: True
@@ -131,7 +133,7 @@ createuser-{{ loop.index }}:
 
 # Do not create table for read-only users, assume it's there already
 {% if not config['read_only']|default(false) %}
-createdb-{{ loop.index }}:
+createdb-{{ index }}:
   postgres_database.present:
     - name: {{ config['database'] }}
     - owner: {{ config['db_owner']|default(config['username']) }}
@@ -149,11 +151,21 @@ createdb-{{ loop.index }}:
 {% endif %}
 {% endif %}
 
+# Create extensions
+{% for extension in config['extensions']|default([]) %}
+extension_{{ config['database'] }}_{{ extension }}_{{ index }}:
+  postgres_extension.present:
+    - name: {{ extension }}
+    - maintenance_db: {{ config['database'] }}
+    - if_not_exists: true
+{% endfor %}
+
+
 # Grant read-only permissions to database if read_only flag is set
 {% if config['read_only']|default(false) %}
 
 # Revoke default CREATE privilege. By default, any role can create objects in the public schema
-revoke_create_on_schema_public-{{ loop.index }}:
+revoke_create_on_schema_public-{{ index }}:
   postgres_privileges.absent:
     - name: {{ config['username'] }}
     - object_name: public
@@ -161,7 +173,7 @@ revoke_create_on_schema_public-{{ loop.index }}:
     - privileges: [CREATE]
     - maintenance_db: {{ config['database'] }}
 
-grant_usage_on_schema_public-{{ loop.index }}:
+grant_usage_on_schema_public-{{ index }}:
   postgres_privileges.present:
     - name: {{ config['username'] }}
     - object_name: public
@@ -169,14 +181,14 @@ grant_usage_on_schema_public-{{ loop.index }}:
     - privileges: [USAGE]
     - maintenance_db: {{ config['database'] }}
 
-grant_connect_to_database-{{ loop.index }}:
+grant_connect_to_database-{{ index }}:
   postgres_privileges.present:
     - name: {{ config['username'] }}
     - object_name: {{ config['database'] }}
     - object_type: database
     - privileges: [CONNECT]
 
-grant_table_select-{{ loop.index }}:
+grant_table_select-{{ index }}:
   postgres_privileges.present:
     - name: {{ config['username'] }}
     - object_name: ALL
@@ -188,7 +200,7 @@ grant_table_select-{{ loop.index }}:
 # Change default privileges, so read-only user also has access to newly created tables
 # There's a salt modules for this, but it's not yet released: https://github.com/saltstack/salt/pull/51904/files
 # Information for querying the default privleges: https://stackoverflow.com/a/14555063
-alter_default_privileges-{{ loop.index }}:
+alter_default_privileges-{{ index }}:
  cmd.run:
     - name: psql {{ config['database'] }} -t -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO {{ config['username'] }};"
     - unless: psql {{ config['database'] }} -t -c "SELECT 1 FROM pg_default_acl a JOIN pg_namespace b ON a.defaclnamespace=b.oid WHERE defaclacl='{ {{ config['username'] }}=r/postgres }'" |grep -q 1
