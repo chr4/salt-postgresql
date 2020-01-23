@@ -122,6 +122,7 @@ postgresql:
       database: production
       address: 10.1.2.0/24
       method: trust
+      inherit: true
       groups:
         - example_role
 
