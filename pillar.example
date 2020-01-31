@@ -110,6 +110,16 @@ postgresql:
       address: all
       method: trust
 
+    # Define user, but don't add pg_hba.conf entry
+    - username: postgres
+      database: template0
+      extensions: [pg_stat_statements]
+      pg_hba: false
+      createdb: true
+      createroles: true
+      replication: true
+      superuser: true
+
     - username: example_role
       type: host
       database: production
