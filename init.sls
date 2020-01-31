@@ -188,6 +188,7 @@ grant_connect_to_database-{{ index }}:
     - object_type: database
     - privileges: [CONNECT]
 
+# TODO: This is always executed
 grant_table_select-{{ index }}:
   postgres_privileges.present:
     - name: {{ config['username'] }}
