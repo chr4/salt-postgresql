@@ -20,6 +20,11 @@ Configure official PostgreSQL repository.
 Install the PostGIS extention.
 
 
+#### sysctl.sls
+
+Configure sysctls according to the PostgreSQL best practises.
+
+
 ## Pillars
 
 Some states require settings set in the salt-pillar.
