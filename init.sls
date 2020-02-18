@@ -44,7 +44,7 @@ chown_pgdata:
     - mode: 644
     - user: postgres
     - group: postgres
-    - source: salt://{{ slspath }}/postgresql.conf.jinja
+    - source: salt://{{ tpldir }}/postgresql.conf.jinja
     - template: jinja
     - defaults:
       config:
@@ -98,7 +98,7 @@ chown_pgdata:
     - mode: 640
     - user: postgres
     - group: postgres
-    - source: salt://{{ slspath }}/pg_hba.conf.jinja
+    - source: salt://{{ tpldir }}/pg_hba.conf.jinja
     - template: jinja
     - require:
       - pkg: postgresql
