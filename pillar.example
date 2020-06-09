@@ -22,14 +22,8 @@ postgresql:
     listen_addresses: "'*'"
 
     # Disable SSL
+    # See section "Deploy SSL certificates" for information howto enable SSL
     ssl: false
-
-    # Enable SSL with custom certificates
-    #
-    # Make sure to deploy the certificates as well, see "certificate" section below
-    ssl: true
-    ssl_cert_file: server.crt
-    ssl_key_file: server.key
 
     # Settings for a general purpose, standalone database instance
     {% set max_connections = 100 %}
@@ -47,6 +41,7 @@ postgresql:
   # e.g.:
   #
   #  config:
+  #    ssl: true
   #    ssl_ca_file: root.crt
   #    ssl_cert_file: server.crt
   #    ssl_key_file: server.key
@@ -82,10 +77,6 @@ postgresql:
       method: trust
       password: password
 
-      # You can specify another owner for the database if required.
-      # If db_owner is not set, it will default to the "username" setting above
-      db_owner: another_owner
-
       # NOTE: The following values represent the defaults
       superuser: false
       createdb: false
@@ -96,12 +87,14 @@ postgresql:
     # Create a read-only user
     # NOTE: This requires that the database was alreay created by a non-read-only user before
     - username: read_only_user
-      type: host
+      type: local
       database: production
-      address: 10.1.2.0/24
       method: trust
-      password: password
       read_only: true
+
+      # You can specify another owner for the database if required.
+      # If db_owner is not set, it will default to the "username" setting above
+      db_owner: user_with_password
 
     - username: owner
       type: host
@@ -112,7 +105,7 @@ postgresql:
 
     # Define user, but don't add pg_hba.conf entry
     - username: postgres
-      database: template0
+      database: template1
       extensions: [pg_stat_statements]
       pg_hba: false
       createdb: true
@@ -122,14 +115,14 @@ postgresql:
 
     - username: example_role
       type: host
-      database: production
+      database: staging
       address: 10.1.2.0/24
       method: trust
       login: false
 
     - username: example_user_with_role
       type: host
-      database: production
+      database: staging
       address: 10.1.2.0/24
       method: trust
       inherit: true
@@ -145,7 +138,7 @@ postgresql:
       method: md5
 
     # If you want multiple databases for a user, you can use a for loop
-    {% for db in ['staging', 'test'] %}
+    {% for db in ['beta', 'test'] %}
     - username: deploy
       type: host
       database: {{ db }}
