@@ -1,5 +1,7 @@
 # postgresql salt formula
 
+![Saltstack](https://github.com/chr4/salt-postgresql/workflows/Saltstack/badge.svg)
+
 This formula installs and configures postgresql.
 
 
