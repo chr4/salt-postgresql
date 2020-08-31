@@ -70,12 +70,10 @@ postgresql:
   # NOTE: If you create multiple users with access to the same database, the last user listed
   #       here will become the owner
   users:
-    - username: user_with_password
-      type: host
+    - username: user_without_password
+      type: local
       database: production
-      address: 10.1.2.0/24
       method: trust
-      password: password
 
       # NOTE: The following values represent the defaults
       superuser: false
@@ -83,6 +81,13 @@ postgresql:
       createroles: false
       inherit: true
       replication: false
+
+    - username: user_with_password
+      type: host
+      database: production
+      address: 10.1.2.0/24
+      password: password
+      method: md5
 
     # Create a read-only user
     # NOTE: This requires that the database was alreay created by a non-read-only user before
@@ -94,7 +99,7 @@ postgresql:
 
       # You can specify another owner for the database if required.
       # If db_owner is not set, it will default to the "username" setting above
-      db_owner: user_with_password
+      db_owner: user_without_password
 
     - username: owner
       type: host
