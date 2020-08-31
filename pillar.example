@@ -137,6 +137,11 @@ postgresql:
       replication: true
       method: md5
 
+    - username: allowall
+      type: local
+      database: all
+      method: trust
+
     # If you want multiple databases for a user, you can use a for loop
     {% for db in ['beta', 'test'] %}
     - username: deploy

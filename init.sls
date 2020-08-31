@@ -128,8 +128,8 @@ createuser-{{ index }}:
     {% endif %}
     - user: postgres
 
-# The "replication" keyword is not a real database but a special keyword used for replication permissions in pg_hba.conf
-{% if config['database'] != "replication" %}
+# The "replication" and "all" keywords are not real databases but special keywords used for permissions in pg_hba.conf
+{% if config['database'] != "replication" and config['database'] != 'all' %}
 
 # Do not create table for read-only users, assume it's there already
 {% if not config['read_only']|default(false) %}

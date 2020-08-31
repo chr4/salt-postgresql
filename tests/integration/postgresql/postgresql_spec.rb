@@ -53,6 +53,12 @@ control 'postgresql' do
     its('auth_method') { should eq ['md5'] }
   end
 
+  describe postgres_hba_conf("/etc/postgresql/#{version}/main/pg_hba.conf").where { user == 'allowall' } do
+    its('type') { should cmp 'local' }
+    its('database') { should cmp 'all' }
+    its('auth_method') { should eq ['trust'] }
+  end
+
   %w(beta test).each do |pg_database|
     describe postgres_hba_conf("/etc/postgresql/#{version}/main/pg_hba.conf").where { database == pg_database } do
       its('type') { should cmp 'host' }
