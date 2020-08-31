@@ -17,11 +17,17 @@ control 'postgresql' do
     its('ssl') { should eq 'False' }
   end
 
+  describe postgres_hba_conf("/etc/postgresql/#{version}/main/pg_hba.conf").where { user == 'user_without_password' } do
+    its('type') { should cmp 'local' }
+    its('database') { should cmp 'production' }
+    its('auth_method') { should eq ['trust'] }
+  end
+
   describe postgres_hba_conf("/etc/postgresql/#{version}/main/pg_hba.conf").where { user == 'user_with_password' } do
     its('type') { should cmp 'host' }
     its('database') { should cmp 'production' }
     its('address') { should cmp '10.1.2.0/24' }
-    its('auth_method') { should eq ['trust'] }
+    its('auth_method') { should eq ['md5'] }
   end
 
   %w(example_role example_user_with_role).each do |pg_user|
@@ -103,7 +109,7 @@ control 'psql' do
   title 'should work'
 
   # Check whether connection works and create a testing table
-  sql = postgres_session('postgres', '', '/run/postgresql')
+  sql = postgres_session('user_without_password', '', '/run/postgresql')
   describe sql.query("CREATE TABLE tests(id SERIAL PRIMARY KEY, name VARCHAR(255));", ['production']) do
     its('output') { should eq('CREATE TABLE') }
   end
@@ -112,6 +118,7 @@ control 'psql' do
   end
 
   # Assert that owner of production database is set correctly
+  sql = postgres_session('postgres', '', '/run/postgresql')
   describe sql.query("SELECT pg_user.usename FROM pg_database JOIN pg_user ON pg_database.datdba=pg_user.usesysid WHERE datname='production';") do
     its('output') { should eq('user_with_password') }
   end

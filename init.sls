@@ -202,9 +202,10 @@ grant_table_select-{{ index }}:
 # There's a salt modules for this, but it's not yet released: https://github.com/saltstack/salt/pull/51904/files
 # Information for querying the default privleges: https://stackoverflow.com/a/14555063
 alter_default_privileges-{{ index }}:
- cmd.run:
-    - name: psql {{ config['database'] }} -t -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO {{ config['username'] }};"
-    - unless: psql {{ config['database'] }} -t -c "SELECT 1 FROM pg_default_acl a JOIN pg_namespace b ON a.defaclnamespace=b.oid WHERE defaclacl='{ {{ config['username'] }}=r/postgres }'" |grep -q 1
+  cmd.run:
+    # NOTE: This only affects tables created by db_owner
+    - name: psql {{ config['database'] }} -t -c "ALTER DEFAULT PRIVILEGES FOR ROLE {{ config['db_owner']|default('postgres') }} IN SCHEMA public GRANT SELECT ON TABLES TO {{ config['username'] }};"
+    - unless: psql {{ config['database'] }} -t -c "SELECT 1 FROM pg_default_acl a JOIN pg_namespace b ON a.defaclnamespace=b.oid WHERE defaclacl='{ {{ config['username'] }}=r/{{ config['db_owner']|default('postgres') }} }'" |grep -q 1
     - runas: postgres
 {% endif %}
 {% endfor %}
