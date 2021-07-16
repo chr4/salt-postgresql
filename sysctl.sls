@@ -14,3 +14,11 @@
 vm.overcommit_memory:
   sysctl.present:
     - value: 2
+
+# Default value of 50% for overcommit_ratio might be too low on systems without swap. It should
+# be increased on systems where higher virtual memory might need to be allocated
+# Virtual memory allocation can be a bit more generous on system with enough RAM available.
+# - https://man7.org/linux/man-pages/man5/proc.5.html
+vm.overcommit_ratio:
+  sysctl.present:
+    - value: {{ salt['pillar.get']('sysctl:vm.overcommit_ratio', 50) }}

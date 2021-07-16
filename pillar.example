@@ -155,3 +155,6 @@ postgresql:
       address: 10.1.2.0/24
       method: trust
     {% endfor %}
+
+sysctl:
+  vm.overcommit_ratio: 70
