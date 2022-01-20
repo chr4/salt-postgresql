@@ -204,7 +204,7 @@ grant_table_select-{{ index }}:
 alter_default_privileges-{{ index }}:
   cmd.run:
     # NOTE: This only affects tables created by db_owner
-    - name: psql {{ config['database'] }} -t -c "ALTER DEFAULT PRIVILEGES FOR ROLE {{ config['db_owner']|default('postgres') }} IN SCHEMA public GRANT SELECT ON TABLES TO {{ config['username'] }};"
+    - name: psql {{ config['database'] }} -t -c 'ALTER DEFAULT PRIVILEGES FOR ROLE {{ config['db_owner']|default('postgres') }} IN SCHEMA public GRANT SELECT ON TABLES TO "{{ config['username'] }}";'
     - unless: psql {{ config['database'] }} -t -c "SELECT 1 FROM pg_default_acl a JOIN pg_namespace b ON a.defaclnamespace=b.oid WHERE defaclacl='{ {{ config['username'] }}=r/{{ config['db_owner']|default('postgres') }} }'" |grep -q 1
     - runas: postgres
 {% endif %}
