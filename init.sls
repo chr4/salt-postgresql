@@ -181,6 +181,15 @@ grant_usage_on_schema_public-{{ index }}:
     - privileges: [USAGE]
     - maintenance_db: {{ config['database'] }}
 
+grant_usage_to_sequences-{{ index }}:
+  postgres_privileges.present:
+    - name: {{ config['username'] }}
+    - object_name: ALL
+    - object_type: sequence
+    - privileges: [USAGE, SELECT]
+    - prepend: public
+    - maintenance_db: {{ config['database'] }}
+
 grant_connect_to_database-{{ index }}:
   postgres_privileges.present:
     - name: {{ config['username'] }}
@@ -197,6 +206,7 @@ grant_table_select-{{ index }}:
     - privileges: [SELECT]
     - prepend: public
     - maintenance_db: {{ config['database'] }}
+
 
 # Change default privileges, so read-only user also has access to newly created tables
 # There's a salt modules for this, but it's not yet released: https://github.com/saltstack/salt/pull/51904/files
