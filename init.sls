@@ -78,7 +78,7 @@ chown_pgdata:
 
     # Overwrite default options and add additional ones according to pillar
     - context:
-{% if salt['pillar.get']('postgresql:config', undefined) is defined %}
+{% if salt['pillar.get']('postgresql:config', none) is not none %}
       config_override:
   {% for key, value in pillar['postgresql']['config']|dictsort %}
         # Strings will be escaped with '' in postgresql.conf.jinja
