@@ -72,7 +72,9 @@ chown_pgdata:
         ssl: on
         ssl_cert_file: /etc/ssl/certs/ssl-cert-snakeoil.pem
         ssl_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
+        {% if version < 15 %}
         stats_temp_directory: /var/run/postgresql/{{ version }}-main.pg_stat_tmp
+        {% endif %}
         timezone: localtime
         unix_socket_directories: /var/run/postgresql
 
