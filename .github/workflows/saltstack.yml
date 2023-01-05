@@ -1,3 +1,5 @@
+# vim: ft=yaml
+
 name: 'Saltstack'
 
 on: [push, pull_request]
@@ -5,7 +7,7 @@ on: [push, pull_request]
 jobs:
   saltstack:
     name: 'Saltstack'
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Install Chef Inspec
       run: |
