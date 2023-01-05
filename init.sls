@@ -112,7 +112,11 @@ chown_pgdata:
 createuser-{{ index }}:
   postgres_user.present:
     - name: {{ config['username'] }}
+    {% if config['method'] == 'scram-sha-256' %}
+    - encrypted: scram-sha-256
+    {% else %}
     - encrypted: True
+    {% endif %}
     - login: {{ config['login']|default(true) }}
     {% if config['password'] is defined %}
     - password: {{ config['password'] }}
