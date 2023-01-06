@@ -82,12 +82,26 @@ postgresql:
       inherit: true
       replication: false
 
-    - username: user_with_password
+    # Users with passwords
+    # NOTE: By default password are stored in scram-sha-256,
+    #       to use md5 you have to set the method explicit to md5.
+
+    # scram-sha-256
+    - username: user_with_scram-sha-256_password
+      type: host
+      database: production
+      address: 10.1.2.0/24
+      password: password
+      method: scram-sha-256
+
+    # md5
+    - username: user_with_md5_password
       type: host
       database: production
       address: 10.1.2.0/24
       password: password
       method: md5
+
 
     # Create a read-only user
     # NOTE: This requires that the database was alreay created by a non-read-only user before
