@@ -116,7 +116,7 @@ control 'psql' do
   title 'should work'
 
   # Check whether connection works and create a testing table
-  sql = postgres_session('user_without_password', '', '', '', '', '/run/postgresql')
+  sql = postgres_session('user_without_password', '', '', '', '/run/postgresql')
   describe sql.query("CREATE TABLE tests(id SERIAL PRIMARY KEY, name VARCHAR(255));", ['production']) do
     its('output') { should eq('CREATE TABLE') }
   end
