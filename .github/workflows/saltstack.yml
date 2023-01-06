@@ -34,4 +34,8 @@ jobs:
           /srv/postgresql/tests/pillar
 
     - name: Run inspec
-      run: sudo inspec exec tests/integration/postgresql
+      run: |
+        sudo cat /etc/postgresql/11/main/pg_hba.conf
+        sudo systemctl status postgresql
+        sudo systemctl status postgresql@11-main.service
+        sudo inspec exec tests/integration/postgresql
