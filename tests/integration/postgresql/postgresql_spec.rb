@@ -109,7 +109,7 @@ control 'psql' do
   title 'should work'
 
   # Check whether connection works and create a testing table
-  sql = postgres_session('user_without_password', '', '/run/postgresql')
+  sql = postgres_session('user_without_password', '', '', '', '/run/postgresql')
   describe sql.query("CREATE TABLE tests(id SERIAL PRIMARY KEY, name VARCHAR(255));", ['production']) do
     its('output') { should eq('CREATE TABLE') }
   end
@@ -118,7 +118,7 @@ control 'psql' do
   end
 
   # Assert that owner of production database is set correctly
-  sql = postgres_session('postgres', '', '/run/postgresql')
+  sql = postgres_session('postgres', '', '', '', '/run/postgresql')
   describe sql.query("SELECT pg_user.usename FROM pg_database JOIN pg_user ON pg_database.datdba=pg_user.usesysid WHERE datname='production';") do
     its('output') { should eq('user_with_password') }
   end
@@ -137,7 +137,7 @@ control 'psql' do
   end
 
   # Assert that read only user only has read access
-  sql = postgres_session('read_only_user', '', '/run/postgresql')
+  sql = postgres_session('read_only_user', '', '', '', '/run/postgresql')
   describe sql.query("INSERT INTO tests (name) VALUES ('shouldfail');", ['production']) do
     its('output') { should match /permission denied for table tests/ }
   end
