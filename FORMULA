@@ -1,7 +1,7 @@
 name: postgresql
 os: Debian, Ubuntu
 os_family: Debian
-version: 201906
+version: 202301
 release: 2
 summary: Formula for installing and configuring postgresql
 description: Formula for installing and configuring postgresql
