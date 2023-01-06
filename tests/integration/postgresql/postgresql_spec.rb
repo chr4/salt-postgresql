@@ -23,7 +23,14 @@ control 'postgresql' do
     its('auth_method') { should eq ['trust'] }
   end
 
-  describe postgres_hba_conf("/etc/postgresql/#{version}/main/pg_hba.conf").where { user == 'user_with_password' } do
+  describe postgres_hba_conf("/etc/postgresql/#{version}/main/pg_hba.conf").where { user == 'user_with_scram-sha-256_password' } do
+    its('type') { should cmp 'host' }
+    its('database') { should cmp 'production' }
+    its('address') { should cmp '10.1.2.0/24' }
+    its('auth_method') { should eq ['scram-sha-256'] }
+  end
+
+  describe postgres_hba_conf("/etc/postgresql/#{version}/main/pg_hba.conf").where { user == 'user_with_md5_password' } do
     its('type') { should cmp 'host' }
     its('database') { should cmp 'production' }
     its('address') { should cmp '10.1.2.0/24' }
@@ -120,7 +127,7 @@ control 'psql' do
   # Assert that owner of production database is set correctly
   sql = postgres_session('postgres', '', '', '', '/run/postgresql')
   describe sql.query("SELECT pg_user.usename FROM pg_database JOIN pg_user ON pg_database.datdba=pg_user.usesysid WHERE datname='production';") do
-    its('output') { should eq('user_with_password') }
+    its('output') { should eq('user_with_md5_password') }
   end
 
   # Assert that groups are correctly represented
