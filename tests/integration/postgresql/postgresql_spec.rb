@@ -127,7 +127,7 @@ control 'psql' do
   # Assert that owner of production database is set correctly
   sql = postgres_session('postgres', '', '', '', '/run/postgresql')
   describe sql.query("SELECT pg_user.usename FROM pg_database JOIN pg_user ON pg_database.datdba=pg_user.usesysid WHERE datname='production';") do
-    its('output') { should eq('user_with_password') }
+    its('output') { should eq('user_with_md5_password') }
   end
 
   # Assert that groups are correctly represented
