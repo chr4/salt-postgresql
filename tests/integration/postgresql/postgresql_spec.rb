@@ -4,7 +4,7 @@ control 'postgresql' do
   title 'should be installed & configured'
 
   describe file('/etc/apt/sources.list.d/apt.postgresql.org.list') do
-    its('content') { should match /^deb http:\/\/apt.postgresql.org\/pub\/repos\/apt / }
+    its('content') { should match /^deb \[signed-by=\/etc\/apt\/keyrings\/pgdg-keyring.gpg\] http:\/\/apt.postgresql.org\/pub\/repos\/apt / }
   end
 
   describe package("postgresql-#{version}") do
