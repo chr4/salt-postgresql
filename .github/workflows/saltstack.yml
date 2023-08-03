@@ -7,7 +7,7 @@ on: [push, pull_request]
 jobs:
   saltstack:
     name: 'Saltstack'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Install Chef Inspec
       run: |
@@ -18,8 +18,8 @@ jobs:
 
     - name: Install salt-minion
       run: |
-        wget -O - https://repo.saltproject.io/salt/py3/ubuntu/20.04/amd64/latest/salt-archive-keyring.gpg | sudo apt-key add -
-        echo "deb https://repo.saltproject.io/salt/py3/ubuntu/20.04/amd64/latest focal main" | sudo tee /etc/apt/sources.list.d/saltstack.list
+        sudo wget -O /etc/apt/keyrings/salt-archive-keyring-2023.gpg https://repo.saltproject.io/salt/py3/ubuntu/22.04/amd64/SALT-PROJECT-GPG-PUBKEY-2023.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/salt-archive-keyring-2023.gpg] https://repo.saltproject.io/salt/py3/ubuntu/22.04/amd64/latest jammy main" | sudo tee /etc/apt/sources.list.d/salt.list
         sudo apt-get update
         sudo apt-get install -y salt-minion
 
