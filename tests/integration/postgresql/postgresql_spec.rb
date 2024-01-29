@@ -138,6 +138,16 @@ control 'psql' do
     its('output') { should match /example_role/ }
   end
 
+  # Assert that connection limit is reflected correctly
+  describe sql.query("SELECT rolconnlimit FROM pg_roles WHERE rolname='example_role'") do
+    its('output') { should eq('100') }
+  end
+
+  # Assert that connection limit for other users is the default
+  describe sql.query("SELECT rolconnlimit FROM pg_roles WHERE rolname='deploy'") do
+    its('output') { should eq('-1') }
+  end
+
   # Assert extensions
   describe sql.query("SELECT extname FROM pg_extension;", ['db_with_extension']) do
     its('output') { should match /pgcrypto/ }

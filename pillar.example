@@ -138,6 +138,7 @@ postgresql:
       address: 10.1.2.0/24
       method: trust
       login: false
+      connection_limit: 100
 
     - username: example_user_with_role
       type: host

@@ -134,6 +134,15 @@ createuser-{{ index }}:
     {% endif %}
     - user: postgres
 
+{% set connection_limit = config.get('connection_limit') %}
+{% if connection_limit %}
+set_user_{{ config['username'] }}_connection_limit:
+  cmd.run:
+    - name: psql -U postgres -c "ALTER ROLE {{ config['username'] }} CONNECTION LIMIT {{ connection_limit }};"
+    - unless: psql -U postgres -t -c "SELECT rolconnlimit FROM pg_roles WHERE rolname = '{{ config['username'] }}';" | grep -wq {{ connection_limit }}
+    - runas: postgres
+{% endif %}
+
 # The "replication" and "all" keywords are not real databases but special keywords used for permissions in pg_hba.conf
 {% if config['database'] != "replication" and config['database'] != 'all' %}
 
